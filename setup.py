@@ -13,6 +13,11 @@ setup(
     description='A simple wrapper for the Discord API with async support.',
     url='https://www.github.com/jwestern1337/discord-api-wrapper',
     author='jwestern1337',
+    classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
     install_requires=[
         'aiohttp',
         'requests'
