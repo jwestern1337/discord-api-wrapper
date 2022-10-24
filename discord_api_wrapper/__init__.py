@@ -220,16 +220,9 @@ class DiscordAPI:
             print(e)
             return False
 
-    def create_guild(self, name: str, region: str, icon: str, verification_level: int, default_message_notifications: int, explicit_content_filter: int, roles: list, channels: list) -> bool:
-        try:
-            r = requests.post(f"{self.base_url}/guilds", headers=self.headers, json={"name": name, "region": region, "icon": icon, "verification_level": verification_level, "default_message_notifications": default_message_notifications, "explicit_content_filter": explicit_content_filter, "roles": roles, "channels": channels})
-            if r.status_code == 200:
-                return r.json()
-            else:
-                return False
-        except Exception as e:
-            print(e)
-            return False
+    def create_guild(self, name: str, region: str, icon: str, verification_level: int, default_message_notifications: int, explicit_content_filter: int) -> bool:
+        r = requests.post(f"{self.base_url}/guilds", headers=self.headers, json={"name": name, "region": region, "icon": icon, "verification_level": verification_level, "default_message_notifications": default_message_notifications, "explicit_content_filter": explicit_content_filter})
+        print(r.text)
 
     def rename_guild(self, guild_id: int, name: str) -> bool:
         try:
@@ -407,6 +400,17 @@ class DiscordAPI:
             print(e)
             return False
 
+    def is_token_valid(self) -> bool:
+        try:
+            r = requests.get(f"{self.base_url}/users/@me", headers=self.headers)
+            if r.status_code == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
 class AsyncDiscordAPI:
     def __init__(self, token: str):
         self.token = token
@@ -558,6 +562,18 @@ class AsyncDiscordAPI:
                 async with session.get(f"{self.base_url}/guilds/{guild_id}/members?limit={limit}&after={after}", headers=self.headers) as r:
                     if r.status == 200:
                         return await r.json()
+                    else:
+                        return False
+        except Exception as e:
+            print(e)
+            return False
+
+    async def is_token_valid(self) -> bool:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{self.base_url}/users/@me", headers=self.headers) as r:
+                    if r.status == 200:
+                        return True
                     else:
                         return False
         except Exception as e:
