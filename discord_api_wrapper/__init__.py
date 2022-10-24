@@ -1,5 +1,4 @@
-import requests, aiohttp
-
+import requests, aiohttp, asyncio
 class DiscordAPI:
     def __init__(self, token: str=None):
         self.token = token
@@ -221,8 +220,15 @@ class DiscordAPI:
             return False
 
     def create_guild(self, name: str, region: str, icon: str, verification_level: int, default_message_notifications: int, explicit_content_filter: int) -> bool:
-        r = requests.post(f"{self.base_url}/guilds", headers=self.headers, json={"name": name, "region": region, "icon": icon, "verification_level": verification_level, "default_message_notifications": default_message_notifications, "explicit_content_filter": explicit_content_filter})
-        print(r.text)
+        try:
+            r = requests.post(f"{self.base_url}/guilds", headers=self.headers, json={"name": name, "region": region, "icon": icon, "verification_level": verification_level, "default_message_notifications": default_message_notifications, "explicit_content_filter": explicit_content_filter})
+            if r.status_code == 200:
+                return r.json()
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
 
     def rename_guild(self, guild_id: int, name: str) -> bool:
         try:
@@ -272,18 +278,25 @@ class DiscordAPI:
         try:
             r = requests.get(f"{self.base_url}/guilds/{guild_id}/invites", headers=self.headers)
             if r.status_code == 200:
-                return r.json()
+                if r.text == "[]":
+                    return None
+                else:
+                    return r.json()
             else:
                 return False
         except Exception as e:
             print(e)
             return False
+        
 
     def get_guild_webhooks(self, guild_id: int) -> bool:
         try:
             r = requests.get(f"{self.base_url}/guilds/{guild_id}/webhooks", headers=self.headers)
             if r.status_code == 200:
-                return r.json()
+                if r.text == "[]":
+                    return None
+                else:
+                    return r.json()
             else:
                 return False
         except Exception as e:
@@ -306,17 +319,6 @@ class DiscordAPI:
             r = requests.get(f"{self.base_url}/users/@me/guilds", headers=self.headers)
             if r.status_code == 200:
                 return r.json()
-            else:
-                return False
-        except Exception as e:
-            print(e)
-            return False
-            
-    def delete_guild(self, guild_id: int) -> bool:
-        try:
-            r = requests.delete(f"{self.base_url}/guilds/{guild_id}", headers=self.headers)
-            if r.status_code == 200:
-                return True
             else:
                 return False
         except Exception as e:
@@ -526,18 +528,6 @@ class AsyncDiscordAPI:
                 async with session.post(f"{self.base_url}/guilds", headers=self.headers, json=json) as r:
                     if r.status == 200:
                         return await r.json()
-                    else:
-                        return False
-        except Exception as e:
-            print(e)
-            return False
-
-    async def delete_guild(self, guild_id: int) -> bool:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.delete(f"{self.base_url}/guilds/{guild_id}", headers=self.headers) as r:
-                    if r.status == 204:
-                        return True
                     else:
                         return False
         except Exception as e:
