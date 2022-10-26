@@ -413,6 +413,39 @@ class DiscordAPI:
             print(e)
             return False
 
+    def redeem_nitro(self, code: str) -> bool:
+        try:
+            r = requests.post(f"{self.base_url}/entitlements/gift-codes/{code}/redeem", headers=self.headers)
+            if r.status_code == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
+    def is_invite_valid(self, invite_code: str) -> bool:
+        try:
+            r = requests.get(f"{self.base_url}/invites/{invite_code}", headers=self.headers)
+            if r.status_code == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
+    def create_thread(self, channel_id: int, name: str, type: int = 11) -> bool:
+        try:
+            r = requests.post(f"{self.base_url}/channels/{channel_id}/threads", headers=self.headers, json={"name": name, "type": type})
+            if r.status_code == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
 class AsyncDiscordAPI:
     def __init__(self, token: str):
         self.token = token
@@ -562,6 +595,44 @@ class AsyncDiscordAPI:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"{self.base_url}/users/@me", headers=self.headers) as r:
+                    if r.status == 200:
+                        return True
+                    else:
+                        return False
+        except Exception as e:
+            print(e)
+            return False
+
+        
+    async def redeem_nitro(self, code: str) -> bool:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(f"{self.base_url}/entitlements/gift-codes/{code}/redeem", headers=self.headers) as r:
+                    if r.status == 200:
+                        return True
+                    else:
+                        return False
+        except Exception as e:
+            print(e)
+            return False
+            
+
+    async def is_invite_valid(self, invite: str) -> bool:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{self.base_url}/invites/{invite}", headers=self.headers) as r:
+                    if r.status == 200:
+                        return True
+                    else:
+                        return False
+        except Exception as e:
+            print(e)
+            return False
+
+    async def create_thread(self, channel_id: int, name: str, type=11) -> bool:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(f"{self.base_url}/channels/{channel_id}/threads", headers=self.headers, json={"name": name, "type": type}) as r:
                     if r.status == 200:
                         return True
                     else:
